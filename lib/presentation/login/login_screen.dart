@@ -1,3 +1,5 @@
+import 'package:ai_parking/presentation/common/custom_text_field.dart';
+import 'package:ai_parking/presentation/register/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,9 +48,9 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _CustomTextField(hintText: '아이디'),
+                    const CustomTextField(hintText: '아이디'),
                     const SizedBox(height: 12),
-                    _CustomTextField(hintText: '비밀번호', obscureText: true),
+                    const CustomTextField(hintText: '비밀번호', obscureText: true),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {},
@@ -69,7 +71,14 @@ class LoginScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
+                        );
+                      },
                       child: Text(
                         '회원가입',
                         style: GoogleFonts.inter(
@@ -153,39 +162,6 @@ class _KakaoLoginButton extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CustomTextField extends StatelessWidget {
-  final String hintText;
-  final bool obscureText;
-
-  const _CustomTextField({required this.hintText, this.obscureText = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: GoogleFonts.inter(
-          color: const Color(0xFF999999),
-          fontSize: 16,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: const BorderSide(color: Color(0xFF0066CC)),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
       ),
     );
   }

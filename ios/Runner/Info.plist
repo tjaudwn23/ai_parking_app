@@ -45,5 +45,22 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <!-- 모든 도메인에 대해 임시허용 -->
+      <key>NSAllowsArbitraryLoads</key>
+      <true/>
+      <!-- 혹은 localhost만 별도 허용하려면 -->
+      <key>NSExceptionDomains</key>
+      <dict>
+        <key>localhost</key>
+        <dict>
+          <key>NSExceptionAllowsInsecureHTTPLoads</key>
+          <true/>
+          <key>NSIncludesSubdomains</key>
+          <true/>
+        </dict>
+      </dict>
+    </dict>
 </dict>
 </plist>
