@@ -1,3 +1,4 @@
+import 'package:ai_parking/presentation/community/community_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -40,7 +41,12 @@ class ParkingStatusScreen extends StatelessWidget {
               color: Color(0xFF454545),
             ),
             onPressed: () {
-              // TODO: Implement chat functionality
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CommunityScreen(),
+                ),
+              );
             },
           ),
         ],
