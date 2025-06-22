@@ -1,3 +1,4 @@
+import 'package:ai_parking/presentation/community/create_post_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -42,10 +43,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF454545)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           '커뮤니티 게시판',
           style: GoogleFonts.inter(
@@ -58,7 +56,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
           IconButton(
             icon: const Icon(Icons.edit_outlined, color: Color(0xFF454545)),
             onPressed: () {
-              // TODO: Implement create post functionality
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CreatePostScreen(),
+                ),
+              );
             },
           ),
         ],
