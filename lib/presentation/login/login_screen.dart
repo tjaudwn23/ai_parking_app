@@ -1,4 +1,5 @@
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
+import 'package:ai_parking/presentation/main/main_screen.dart';
 import 'package:ai_parking/presentation/register/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -53,7 +54,14 @@ class LoginScreen extends StatelessWidget {
                     const CustomTextField(hintText: '비밀번호', obscureText: true),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainScreen(),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0066CC),
                         shape: RoundedRectangleBorder(
@@ -102,7 +110,12 @@ class _GoogleLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
@@ -138,7 +151,12 @@ class _KakaoLoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFFE500),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
