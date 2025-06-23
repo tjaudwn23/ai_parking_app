@@ -1,4 +1,5 @@
 import 'package:ai_parking/presentation/community/community_screen.dart';
+import 'package:ai_parking/presentation/my_info/my_info_screen.dart';
 import 'package:ai_parking/presentation/parking_status/parking_status_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   static const List<Widget> _screens = <Widget>[
     _HomeScreen(),
     CommunityScreen(),
-    Scaffold(body: Center(child: Text('내 정보'))),
+    MyInfoScreen(),
   ];
 
   void _onItemTapped(int index) {
