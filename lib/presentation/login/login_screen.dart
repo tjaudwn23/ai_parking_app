@@ -1,12 +1,64 @@
+import 'dart:convert';
+
+import 'package:ai_parking/data/data_source/auth_api.dart';
+import 'package:ai_parking/data/model/login_response.dart';
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
 import 'package:ai_parking/presentation/main/main_screen.dart';
 import 'package:ai_parking/presentation/register/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:ai_parking/presentation/provider/user_provider.dart';
+import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await Provider.of<UserProvider>(
+        context,
+        listen: false,
+      ).login(_usernameController.text, _passwordController.text);
+      // 화면 전환은 AuthWrapper가 처리하므로 네비게이션 코드 불필요
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('로그인 중 오류가 발생했습니다\n아이디와 비밀번호를 확인해주세요.')),
+        );
+        print(e);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,19 +101,19 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const CustomTextField(hintText: '아이디'),
+                    CustomTextField(
+                      controller: _usernameController,
+                      hintText: '아이디',
+                    ),
                     const SizedBox(height: 12),
-                    const CustomTextField(hintText: '비밀번호', obscureText: true),
+                    CustomTextField(
+                      controller: _passwordController,
+                      hintText: '비밀번호',
+                      obscureText: true,
+                    ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: _login,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0066CC),
                         shape: RoundedRectangleBorder(
@@ -69,13 +121,22 @@ class LoginScreen extends StatelessWidget {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text(
-                        '로그인',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 3,
+                              ),
+                            )
+                          : Text(
+                              '로그인',
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                     const SizedBox(height: 16),
                     TextButton(
@@ -111,10 +172,10 @@ class _GoogleLoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.pushReplacement(
+        // TODO: 구글 로그인 구현
+        ScaffoldMessenger.of(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
+        ).showSnackBar(const SnackBar(content: Text('구글 로그인은 아직 구현되지 않았습니다.')));
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
@@ -152,9 +213,9 @@ class _KakaoLoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+        // TODO: 카카오 로그인 구현
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('카카오 로그인은 아직 구현되지 않았습니다.')),
         );
       },
       style: ElevatedButton.styleFrom(

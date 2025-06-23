@@ -1,8 +1,10 @@
 import 'package:ai_parking/presentation/my_info/change_password_screen.dart';
 import 'package:ai_parking/presentation/my_info/edit_profile_screen.dart';
 import 'package:ai_parking/presentation/my_info/push_notification_settings_screen.dart';
+import 'package:ai_parking/presentation/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class MyInfoScreen extends StatelessWidget {
   const MyInfoScreen({super.key});
@@ -62,47 +64,56 @@ class _ProfileSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final user = userProvider.user;
+        if (user == null) {
+          return const Center(child: Text('사용자 정보가 없습니다.'));
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const CircleAvatar(
-            radius: 40,
-            backgroundColor: Color(0xFFF5F5F5),
-            // TODO: Add user profile image
-            child: Icon(Icons.person, size: 40, color: Color(0xFFCCCCCC)),
+          child: Column(
+            children: [
+              const CircleAvatar(
+                radius: 40,
+                backgroundColor: Color(0xFFF5F5F5),
+                // TODO: Add user profile image
+                child: Icon(Icons.person, size: 40, color: Color(0xFFCCCCCC)),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                user.nickname,
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF454545),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                user.nickname, // 임시로 닉네임 표시
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: const Color(0xFF999999),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            '홍길동',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF454545),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'user1@example.com',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: const Color(0xFF999999),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -112,31 +123,40 @@ class _AccountInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final user = userProvider.user;
+        if (user == null) {
+          return const SizedBox.shrink(); // 사용자 정보 없으면 표시 안함
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: const Column(
-        children: [
-          _InfoRow(title: '아이디', value: 'user1'),
-          SizedBox(height: 12),
-          _InfoRow(title: '집 주소', value: '서울시 강남구 ○○로 ○○'),
-          SizedBox(height: 12),
-          _InfoRow(title: '동/호수', value: '101동 203호'),
-          SizedBox(height: 12),
-          _InfoRow(title: '휴대폰', value: '010-1234-5678'),
-        ],
-      ),
+          child: Column(
+            children: [
+              _InfoRow(title: '아이디', value: user.nickname), // 임시로 닉네임 표시
+              const SizedBox(height: 12),
+              _InfoRow(title: '집 주소', value: user.address),
+              const SizedBox(height: 12),
+              _InfoRow(title: '동/호수', value: user.addressDetail),
+              const SizedBox(height: 12),
+              _InfoRow(title: '휴대폰', value: user.phoneNumber),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -306,7 +326,7 @@ class _LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // TODO: 로그아웃 로직 구현
+        Provider.of<UserProvider>(context, listen: false).logout();
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFDB3645),

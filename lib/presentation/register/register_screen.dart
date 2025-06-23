@@ -1,3 +1,5 @@
+import 'package:ai_parking/data/data_source/auth_api.dart';
+import 'package:ai_parking/data/model/user_register.dart';
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
 import 'package:ai_parking/presentation/login/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _idController = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController =
       TextEditingController();
@@ -23,17 +26,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _verificationCodeController =
       TextEditingController();
 
+  final AuthApi _authApi = AuthApi();
+  bool _isLoading = false;
+
   double? _latitude;
   double? _longitude;
   bool _isVerificationCodeSent = false;
   bool _isVerified = false;
   bool _isSignUpButtonEnabled = false;
   String? _passwordErrorMessage;
+  String? _nicknameErrorMessage;
+  String? _idErrorMessage;
 
   @override
   void initState() {
     super.initState();
     _idController.addListener(_updateSignUpButtonState);
+    _nicknameController.addListener(_updateSignUpButtonState);
     _passwordController.addListener(_updateSignUpButtonState);
     _passwordConfirmController.addListener(_updateSignUpButtonState);
     _addressController.addListener(_updateSignUpButtonTapped);
@@ -44,6 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     _idController.dispose();
+    _nicknameController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
     _addressController.removeListener(_updateSignUpButtonTapped);
@@ -62,11 +72,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       final allFieldsFilled =
           _idController.text.isNotEmpty &&
+          _nicknameController.text.isNotEmpty &&
           _passwordController.text.isNotEmpty &&
           _passwordConfirmController.text.isNotEmpty &&
           _addressController.text.isNotEmpty &&
           _phoneController.text.isNotEmpty &&
           _verificationCodeController.text.isNotEmpty;
+
+      final idIsValid = _isEmailValid(_idController.text);
+      if (_idController.text.isNotEmpty) {
+        if (!idIsValid) {
+          _idErrorMessage = '올바른 이메일 형식이 아닙니다.';
+        } else {
+          _idErrorMessage = null;
+        }
+      } else {
+        _idErrorMessage = null;
+      }
+
+      final nicknameIsValid = _nicknameController.text.length >= 2;
+      if (_nicknameController.text.isNotEmpty) {
+        if (!nicknameIsValid) {
+          _nicknameErrorMessage = '닉네임은 2자 이상이어야 합니다.';
+        } else {
+          _nicknameErrorMessage = null;
+        }
+      } else {
+        _nicknameErrorMessage = null;
+      }
 
       final passwordIsValid = _isPasswordValid(_passwordController.text);
       final passwordsMatch =
@@ -85,14 +118,76 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
 
       _isSignUpButtonEnabled =
-          allFieldsFilled && passwordIsValid && passwordsMatch && _isVerified;
+          allFieldsFilled &&
+          idIsValid &&
+          nicknameIsValid &&
+          passwordIsValid &&
+          passwordsMatch &&
+          _isVerified;
     });
+  }
+
+  bool _isEmailValid(String email) {
+    // Basic email regex
+    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegExp.hasMatch(email);
   }
 
   bool _isPasswordValid(String password) {
     // 8자 이상, 대문자 및 소문자 포함
     final passwordRegExp = RegExp(r'^(?=.*[a-z])(?=.*[A-Z]).{8,}$');
     return passwordRegExp.hasMatch(password);
+  }
+
+  Future<void> _signUp() async {
+    if (!_isSignUpButtonEnabled || _isLoading) return;
+
+    if (_latitude == null || _longitude == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('주소를 먼저 검색해주세요.')));
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final user = UserRegister(
+      email: _idController.text,
+      password: _passwordController.text,
+      nickname: _nicknameController.text,
+      phoneNumber: _phoneController.text,
+      address: _addressController.text,
+      addressDetail: _addressDetailController.text,
+      latitude: _latitude!,
+      longitude: _longitude!,
+    );
+
+    try {
+      final message = await _authApi.signUp(user);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (Route<dynamic> route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('회원가입 중 오류가 발생했습니다: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -127,6 +222,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     CustomTextField(hintText: '아이디', controller: _idController),
+                    if (_idErrorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          _idErrorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      hintText: '닉네임',
+                      controller: _nicknameController,
+                    ),
+                    if (_nicknameErrorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          _nicknameErrorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 12),
                     CustomTextField(
                       hintText: '비밀번호',
@@ -260,7 +382,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     const SizedBox(height: 32),
                     ElevatedButton(
-                      onPressed: _isSignUpButtonEnabled ? () {} : null,
+                      onPressed: _isSignUpButtonEnabled ? _signUp : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _isSignUpButtonEnabled
                             ? const Color(0xFF0066CC)
@@ -270,13 +392,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text(
-                        '회원가입',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 3,
+                              ),
+                            )
+                          : Text(
+                              '회원가입',
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ],
                 ),
