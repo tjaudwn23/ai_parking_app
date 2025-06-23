@@ -43,7 +43,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: Text(
           '커뮤니티 게시판',
           style: GoogleFonts.inter(

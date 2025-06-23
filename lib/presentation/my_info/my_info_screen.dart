@@ -1,3 +1,6 @@
+import 'package:ai_parking/presentation/my_info/change_password_screen.dart';
+import 'package:ai_parking/presentation/my_info/edit_profile_screen.dart';
+import 'package:ai_parking/presentation/my_info/push_notification_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,7 +24,12 @@ class MyInfoScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
             onPressed: () {
-              // TODO: 설정 화면으로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EditProfileScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -184,18 +192,76 @@ class _SettingsSection extends StatelessWidget {
       child: Column(
         children: [
           _buildSettingsItem(context, '비밀번호 변경', () {
-            // TODO: 비밀번호 변경 로직
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ChangePasswordScreen(),
+              ),
+            );
           }),
           _buildDivider(),
           _buildSettingsItem(context, '푸시 알림 설정', () {
-            // TODO: 푸시 알림 설정 로직
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PushNotificationSettingsScreen(),
+              ),
+            );
           }),
           _buildDivider(),
           _buildSettingsItem(context, '회원 탈퇴', () {
-            // TODO: 회원 탈퇴 로직
+            _showWithdrawalDialog(context);
           }),
         ],
       ),
+    );
+  }
+
+  void _showWithdrawalDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          title: Text(
+            '회원 탈퇴',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF333333),
+            ),
+          ),
+          content: Text(
+            '정말로 탈퇴하시겠습니까?\n모든 정보가 삭제되며 복구할 수 없습니다.',
+            style: GoogleFonts.inter(color: const Color(0xFF454545)),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                '취소',
+                style: GoogleFonts.inter(color: const Color(0xFF999999)),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // TODO: 회원 탈퇴 API 호출 로직 구현
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+              },
+              child: Text(
+                '탈퇴',
+                style: GoogleFonts.inter(
+                  color: const Color(0xFFDB3645),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
