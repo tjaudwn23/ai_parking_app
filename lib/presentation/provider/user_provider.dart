@@ -44,4 +44,8 @@ class UserProvider extends ChangeNotifier {
     await _storage.deleteAll();
     notifyListeners();
   }
+
+  Future<String?> getAccessToken() async {
+    return await _storage.read(key: 'access_token');
+  }
 }

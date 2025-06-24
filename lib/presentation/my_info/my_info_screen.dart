@@ -146,7 +146,7 @@ class _AccountInfoSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _InfoRow(title: '아이디', value: user.nickname), // 임시로 닉네임 표시
+              _InfoRow(title: '아이디', value: user.email), // 임시로 닉네임 표시
               const SizedBox(height: 12),
               _InfoRow(title: '집 주소', value: user.address),
               const SizedBox(height: 12),

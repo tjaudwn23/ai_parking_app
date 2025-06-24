@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ai_parking/data/data_source/auth_api.dart';
+import 'package:ai_parking/data/model/notification_settings.dart';
+import 'package:provider/provider.dart';
+import 'package:ai_parking/presentation/provider/user_provider.dart';
 
 class PushNotificationSettingsScreen extends StatefulWidget {
   const PushNotificationSettingsScreen({super.key});
@@ -12,9 +16,56 @@ class PushNotificationSettingsScreen extends StatefulWidget {
 class _PushNotificationSettingsScreenState
     extends State<PushNotificationSettingsScreen> {
   bool _parkingInfoUpdateEnabled = true;
-  bool _newPostEnabled = false;
+  bool _newPostEnabled = true;
   bool _commentLikeEnabled = true;
   bool _appNewsEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userToken = await userProvider.getAccessToken();
+    if (userToken == null) return;
+    final settings = await AuthApi.fetchNotificationSettings(userToken);
+    if (settings != null && mounted) {
+      setState(() {
+        _parkingInfoUpdateEnabled = settings.parkingUpdate;
+        _newPostEnabled = settings.newPostInArea;
+        _commentLikeEnabled = settings.commentLike;
+        _appNewsEnabled = settings.appNews;
+      });
+    }
+  }
+
+  Future<void> _updateSettings() async {
+    final settings = NotificationSettings(
+      parkingUpdate: _parkingInfoUpdateEnabled,
+      newPostInArea: _newPostEnabled,
+      commentLike: _commentLikeEnabled,
+      appNews: _appNewsEnabled,
+    );
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userToken = await userProvider.getAccessToken();
+    if (userToken == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('로그인이 필요합니다.')));
+      return;
+    }
+    final success = await AuthApi.updateNotificationSettings(
+      settings,
+      userToken,
+    );
+    if (!success && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('알림 설정 저장에 실패했습니다.')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +101,7 @@ class _PushNotificationSettingsScreenState
               setState(() {
                 _parkingInfoUpdateEnabled = value;
               });
+              _updateSettings();
             },
           ),
           _buildDivider(),
@@ -61,6 +113,7 @@ class _PushNotificationSettingsScreenState
               setState(() {
                 _newPostEnabled = value;
               });
+              _updateSettings();
             },
           ),
           _buildSwitchListTile(
@@ -70,6 +123,7 @@ class _PushNotificationSettingsScreenState
               setState(() {
                 _commentLikeEnabled = value;
               });
+              _updateSettings();
             },
           ),
           _buildDivider(),
@@ -81,6 +135,7 @@ class _PushNotificationSettingsScreenState
               setState(() {
                 _appNewsEnabled = value;
               });
+              _updateSettings();
             },
           ),
         ],
