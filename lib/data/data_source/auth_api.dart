@@ -4,6 +4,7 @@ import 'package:ai_parking/data/model/user_register.dart';
 import 'package:ai_parking/data/model/change_password_request.dart';
 import 'package:http/http.dart' as http;
 import '../model/notification_settings.dart';
+import 'package:ai_parking/data/model/user_data.dart';
 
 class AuthApi {
   static const String baseUrl = 'http://localhost:8000';
@@ -117,5 +118,24 @@ class AuthApi {
       },
     );
     return response.statusCode == 200;
+  }
+
+  Future<UserData> patchUserProfile(
+    UserData userData,
+    String accessToken,
+  ) async {
+    final response = await _client.patch(
+      Uri.parse('$baseUrl/api/auth/user-profile'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode(userData.toJson()),
+    );
+    if (response.statusCode == 200) {
+      return UserData.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('프로필 수정 실패: $response');
+    }
   }
 }

@@ -56,4 +56,42 @@ class UserProvider extends ChangeNotifier {
   Future<String?> getAccessToken() async {
     return await _storage.read(key: 'access_token');
   }
+
+  Future<void> editProfile({
+    required String nickname,
+    required String address,
+    required String addressDetail,
+    required String phoneNumber,
+  }) async {
+    final accessToken = await getAccessToken();
+    if (accessToken == null || _user == null) throw Exception('로그인 필요');
+
+    final oldUser = _user;
+
+    final updatedUser = UserData(
+      email: _user!.email,
+      address: address,
+      latitude: _user!.latitude,
+      nickname: nickname,
+      longitude: _user!.longitude,
+      phoneNumber: phoneNumber,
+      addressDetail: addressDetail,
+      emailVerified: _user!.emailVerified,
+      phoneVerified: _user!.phoneVerified,
+    );
+
+    try {
+      final newUser = await _authApi.patchUserProfile(updatedUser, accessToken);
+      _user = newUser;
+      await _storage.write(
+        key: 'user_data',
+        value: jsonEncode(newUser.toJson()),
+      );
+      notifyListeners();
+    } catch (e) {
+      _user = oldUser;
+      notifyListeners();
+      rethrow;
+    }
+  }
 }
