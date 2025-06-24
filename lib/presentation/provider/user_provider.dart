@@ -5,11 +5,17 @@ import 'package:ai_parking/data/model/login_response.dart';
 import 'package:ai_parking/data/model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
 class UserProvider extends ChangeNotifier {
   UserData? _user;
   final AuthApi _authApi = AuthApi();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  UserProvider() {
+    print('UserProvider 생성됨!');
+    tryAutoLogin();
+  }
 
   UserData? get user => _user;
   bool get isLoggedIn => _user != null;
@@ -25,6 +31,8 @@ class UserProvider extends ChangeNotifier {
   Future<void> login(String email, String password) async {
     final LoginResponse loginResponse = await _authApi.login(email, password);
     _user = loginResponse.user;
+    print('로그인 응답 user: [32m[1m[4m[7m${loginResponse.user}[0m');
+    print('UserData json: [34m[1m[4m[7m${loginResponse.user.toJson()}[0m');
 
     await _storage.write(key: 'access_token', value: loginResponse.accessToken);
     await _storage.write(

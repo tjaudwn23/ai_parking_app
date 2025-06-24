@@ -23,6 +23,9 @@ class AuthApi {
       }),
     );
 
+    // 로그인 API 응답 본문을 출력하여 디버깅
+    print('로그인 API 응답: \x1B[35m\x1B[1m\x1B[4m\x1B[7m${response.body}\x1B[0m');
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       return LoginResponse.fromJson(data);
@@ -100,5 +103,19 @@ class AuthApi {
       // 에러 처리: 필요시 로그 등
       return null;
     }
+  }
+
+  /// 회원탈퇴 API 호출
+  /// [token]: access token (Bearer)
+  /// 성공 시 true, 실패 시 false 반환
+  Future<bool> withdrawal(String token) async {
+    final response = await _client.delete(
+      Uri.parse('$baseUrl/api/auth/withdrawal'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    return response.statusCode == 200;
   }
 }

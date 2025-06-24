@@ -34,22 +34,11 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: context.read<UserProvider>().tryAutoLogin(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        return Consumer<UserProvider>(
-          builder: (context, userProvider, child) {
-            return userProvider.isLoggedIn
-                ? const MainScreen()
-                : const LoginScreen();
-          },
-        );
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        return userProvider.isLoggedIn
+            ? const MainScreen()
+            : const LoginScreen();
       },
     );
   }

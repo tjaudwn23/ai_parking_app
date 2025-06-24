@@ -5,6 +5,7 @@ import 'package:ai_parking/presentation/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:ai_parking/data/data_source/auth_api.dart';
 
 class MyInfoScreen extends StatelessWidget {
   const MyInfoScreen({super.key});
@@ -267,9 +268,31 @@ class _SettingsSection extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () {
-                // TODO: 회원 탈퇴 API 호출 로직 구현
+              onPressed: () async {
+                // 회원탈퇴 API 직접 호출 및 결과 처리
+                final userProvider = Provider.of<UserProvider>(
+                  context,
+                  listen: false,
+                );
+                final token = await userProvider.getAccessToken();
+                bool success = false;
+                if (token != null) {
+                  success = await AuthApi().withdrawal(token);
+                }
                 Navigator.of(context).pop(); // 다이얼로그 닫기
+
+                if (success) {
+                  // 회원탈퇴 성공: 로그아웃 후 로그인 화면으로 이동(스택 초기화)
+                  await userProvider.logout();
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/login', (route) => false);
+                } else {
+                  // 회원탈퇴 실패: 에러 메시지 안내
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('회원 탈퇴에 실패했습니다. 다시 시도해주세요.')),
+                  );
+                }
               },
               child: Text(
                 '탈퇴',
