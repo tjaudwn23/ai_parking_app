@@ -1,4 +1,5 @@
 class UserData {
+  final String email;
   final String address;
   final double latitude;
   final String nickname;
@@ -9,6 +10,7 @@ class UserData {
   final bool phoneVerified;
 
   UserData({
+    required this.email,
     required this.address,
     required this.latitude,
     required this.nickname,
@@ -21,6 +23,7 @@ class UserData {
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
+      email: json['email'] ?? '',
       address: json['address'] ?? '',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
       nickname: json['nickname'] ?? '',
@@ -34,6 +37,7 @@ class UserData {
 
   Map<String, dynamic> toJson() {
     return {
+      'email': email,
       'address': address,
       'latitude': latitude,
       'nickname': nickname,

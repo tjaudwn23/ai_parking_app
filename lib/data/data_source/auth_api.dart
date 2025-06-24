@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:ai_parking/data/model/login_response.dart';
 import 'package:ai_parking/data/model/user_register.dart';
+import 'package:ai_parking/data/model/change_password_request.dart';
 import 'package:http/http.dart' as http;
 
 class AuthApi {
@@ -43,6 +44,24 @@ class AuthApi {
       return data['message'] ?? '회원가입에 성공했습니다.';
     } else {
       throw Exception('Failed to sign up: ${response.body}');
+    }
+  }
+
+  Future<String> changePassword(ChangePasswordRequest req) async {
+    final response = await _client.post(
+      Uri.parse('$_baseUrl/api/auth/change-password'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(req.toJson()),
+    );
+
+    print(req.toJson());
+    final Map<String, dynamic> data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return data['message'] ?? '비밀번호가 성공적으로 변경되었습니다.';
+    } else {
+      throw Exception(data['message'] ?? '비밀번호 변경에 실패했습니다.');
     }
   }
 }

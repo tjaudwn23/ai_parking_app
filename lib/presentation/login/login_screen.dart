@@ -1,14 +1,8 @@
-import 'dart:convert';
-
-import 'package:ai_parking/data/data_source/auth_api.dart';
-import 'package:ai_parking/data/model/login_response.dart';
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
-import 'package:ai_parking/presentation/main/main_screen.dart';
 import 'package:ai_parking/presentation/register/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:ai_parking/presentation/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
