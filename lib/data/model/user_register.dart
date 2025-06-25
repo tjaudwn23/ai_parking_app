@@ -7,6 +7,7 @@ class UserRegister {
   final String addressDetail;
   final double latitude;
   final double longitude;
+  final String name;
 
   UserRegister({
     required this.email,
@@ -17,6 +18,7 @@ class UserRegister {
     required this.addressDetail,
     required this.latitude,
     required this.longitude,
+    required this.name,
   });
 
   Map<String, dynamic> toJson() {
@@ -29,6 +31,7 @@ class UserRegister {
       'address_detail': addressDetail,
       'latitude': latitude,
       'longitude': longitude,
+      'name': name,
     };
   }
 }

@@ -3,6 +3,11 @@ import 'package:ai_parking/presentation/my_info/my_info_screen.dart';
 import 'package:ai_parking/presentation/parking_status/parking_status_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ai_parking/data/model/building.dart';
+import 'package:ai_parking/data/data_source/building_api.dart';
+import 'package:ai_parking/data/model/user_data.dart';
+import 'package:provider/provider.dart';
+import 'package:ai_parking/presentation/provider/user_provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -62,6 +67,12 @@ class _HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
+    if (user == null) {
+      return const Center(child: Text('유저 정보가 없습니다. 로그인 후 이용해주세요.'));
+    }
+    final buildingApi = BuildingApi();
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -76,7 +87,7 @@ class _HomeScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              '[아파트A]',
+              user.name,
               style: GoogleFonts.inter(
                 color: const Color(0xFF454545),
                 fontSize: 16,
@@ -93,44 +104,33 @@ class _HomeScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '• 동별 주차 현황',
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF454545),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _ParkingStatusCard(
-                dong: '101동',
-                available: 12,
-                total: 50,
-                progress: 12 / 50,
-              ),
-              const SizedBox(height: 12),
-              _ParkingStatusCard(
-                dong: '102동',
-                available: 5,
-                total: 30,
-                progress: 5 / 30,
-              ),
-              const SizedBox(height: 12),
-              _ParkingStatusCard(
-                dong: '103동',
-                available: 20,
-                total: 40,
-                progress: 20 / 40,
-              ),
-            ],
-          ),
-        ),
+      body: FutureBuilder<List<Building>>(
+        future: buildingApi.fetchBuildings(user.address),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('동 정보 불러오기 실패: \\${snapshot.error}'));
+          }
+          final buildings = snapshot.data!;
+          return ListView.builder(
+            padding: const EdgeInsets.all(20.0),
+            itemCount: buildings.length,
+            itemBuilder: (context, index) {
+              final b = buildings[index];
+              return _ParkingStatusCard(
+                dong: b.name,
+                available: b.parkingStatus.availableSpaces,
+                total: b.parkingStatus.totalSpaces,
+                progress: b.parkingStatus.totalSpaces == 0
+                    ? 0
+                    : b.parkingStatus.availableSpaces /
+                          b.parkingStatus.totalSpaces,
+              );
+            },
+          );
+        },
       ),
     );
   }

@@ -78,6 +78,7 @@ class UserProvider extends ChangeNotifier {
       addressDetail: addressDetail,
       emailVerified: _user!.emailVerified,
       phoneVerified: _user!.phoneVerified,
+      name: _user!.name,
     );
 
     try {

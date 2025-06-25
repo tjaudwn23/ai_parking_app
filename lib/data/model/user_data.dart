@@ -8,6 +8,7 @@ class UserData {
   final String addressDetail;
   final bool emailVerified;
   final bool phoneVerified;
+  final String name;
 
   UserData({
     required this.email,
@@ -19,6 +20,7 @@ class UserData {
     required this.addressDetail,
     required this.emailVerified,
     required this.phoneVerified,
+    required this.name,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class UserData {
       addressDetail: json['address_detail'] ?? '',
       emailVerified: json['email_verified'] ?? false,
       phoneVerified: json['phone_verified'] ?? false,
+      name: json['name'] ?? '',
     );
   }
 
@@ -46,6 +49,7 @@ class UserData {
       'address_detail': addressDetail,
       'email_verified': emailVerified,
       'phone_verified': phoneVerified,
+      'name': name,
     };
   }
 }

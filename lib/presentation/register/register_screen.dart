@@ -31,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   double? _latitude;
   double? _longitude;
+  String? _buildingName;
   bool _isVerificationCodeSent = false;
   bool _isVerified = false;
   bool _isSignUpButtonEnabled = false;
@@ -162,6 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       addressDetail: _addressDetailController.text,
       latitude: _latitude!,
       longitude: _longitude!,
+      name: _buildingName!,
     );
 
     try {
@@ -283,12 +285,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               kakaoKey: 'e513f614570c5df20937c7c0feb56f55',
                               callback: (Kpostal result) {
                                 print(
-                                  '주소: ${result.address}, 위도: ${result.latitude}, 경도: ${result.longitude}',
+                                  '주소: [33m${result.address}[0m, 위도: [33m${result.latitude}[0m, 경도: [33m${result.longitude}[0m, 건물명: [33m${result.buildingName}[0m',
                                 );
                                 setState(() {
                                   _addressController.text = result.address;
                                   _latitude = result.latitude;
                                   _longitude = result.longitude;
+                                  _buildingName = result.buildingName;
                                 });
                               },
                             ),
