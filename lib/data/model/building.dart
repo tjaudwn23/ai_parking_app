@@ -4,7 +4,7 @@ class Building {
   final String name;
   final String createdAt;
   final String buildingId;
-  final ParkingStatus parkingStatus;
+  final ParkingStatus? parkingStatus;
 
   Building({
     required this.id,
@@ -12,7 +12,7 @@ class Building {
     required this.name,
     required this.createdAt,
     required this.buildingId,
-    required this.parkingStatus,
+    this.parkingStatus,
   });
 
   factory Building.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,9 @@ class Building {
       name: json['name'],
       createdAt: json['created_at'],
       buildingId: json['building_id'],
-      parkingStatus: ParkingStatus.fromJson(json['parking_status']),
+      parkingStatus: json['parking_status'] != null
+          ? ParkingStatus.fromJson(json['parking_status'])
+          : null,
     );
   }
 }
@@ -37,6 +39,22 @@ class ParkingStatus {
     return ParkingStatus(
       totalSpaces: json['total_spaces'],
       availableSpaces: json['available_spaces'],
+    );
+  }
+}
+
+class BuildingListResponse {
+  final String apartmentId;
+  final List<Building> buildings;
+
+  BuildingListResponse({required this.apartmentId, required this.buildings});
+
+  factory BuildingListResponse.fromJson(Map<String, dynamic> json) {
+    return BuildingListResponse(
+      apartmentId: json['apartment_id'],
+      buildings: (json['buildings'] as List)
+          .map((e) => Building.fromJson(e))
+          .toList(),
     );
   }
 }

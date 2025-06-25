@@ -104,7 +104,7 @@ class _HomeScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
       ),
-      body: FutureBuilder<List<Building>>(
+      body: FutureBuilder<BuildingListResponse>(
         future: buildingApi.fetchBuildings(user.address),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -113,7 +113,23 @@ class _HomeScreen extends StatelessWidget {
           if (snapshot.hasError) {
             return Center(child: Text('동 정보 불러오기 실패: \\${snapshot.error}'));
           }
-          final buildings = snapshot.data!;
+          if (snapshot.data!.buildings.isEmpty) {
+            return const Center(child: Text('동 정보가 없습니다.'));
+          }
+
+          // apartmentId를 유저 데이터에 저장
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final userProvider = Provider.of<UserProvider>(
+              context,
+              listen: false,
+            );
+            final newApartmentId = snapshot.data!.apartmentId;
+            if (userProvider.user?.apartmentId != newApartmentId) {
+              userProvider.setApartmentId(newApartmentId);
+            }
+          });
+
+          final buildings = snapshot.data!.buildings;
           return ListView.builder(
             padding: const EdgeInsets.all(20.0),
             itemCount: buildings.length,
@@ -121,12 +137,12 @@ class _HomeScreen extends StatelessWidget {
               final b = buildings[index];
               return _ParkingStatusCard(
                 dong: b.name,
-                available: b.parkingStatus.availableSpaces,
-                total: b.parkingStatus.totalSpaces,
-                progress: b.parkingStatus.totalSpaces == 0
+                available: b.parkingStatus?.availableSpaces ?? 0,
+                total: b.parkingStatus?.totalSpaces ?? 0,
+                progress: (b.parkingStatus?.totalSpaces ?? 0) == 0
                     ? 0
-                    : b.parkingStatus.availableSpaces /
-                          b.parkingStatus.totalSpaces,
+                    : (b.parkingStatus?.availableSpaces ?? 0) /
+                          (b.parkingStatus?.totalSpaces ?? 1),
                 buildingId: b.buildingId,
               );
             },

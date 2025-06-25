@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ai_parking/data/model/building.dart';
+import 'package:ai_parking/data/data_source/building_api.dart';
+import 'package:ai_parking/data/data_source/board_api.dart';
+import 'package:provider/provider.dart';
+import 'package:ai_parking/presentation/provider/user_provider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({super.key});
@@ -12,12 +19,40 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
+  List<Building> _buildings = [];
+  Building? _selectedBuilding;
+  bool _isLoading = true;
+  String? _errorMessage;
+  final List<File> _images = [];
+  final ImagePicker _picker = ImagePicker();
+  bool _isSubmitting = false;
+
   @override
   void initState() {
     super.initState();
     _contentController.addListener(() {
       setState(() {});
     });
+    _fetchBuildings();
+  }
+
+  Future<void> _fetchBuildings() async {
+    try {
+      final buildings = await BuildingApi().fetchAllBuildings();
+      setState(() {
+        _buildings = buildings;
+        if (_buildings.isNotEmpty) {
+          _selectedBuilding ??= _buildings.first;
+        }
+        _isLoading = false;
+        _errorMessage = null;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = '동 목록을 불러오지 못했습니다. 네트워크를 확인하거나 다시 시도해 주세요.';
+      });
+    }
   }
 
   @override
@@ -29,6 +64,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -52,6 +88,45 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (_isLoading)
+              const CircularProgressIndicator()
+            else if (_errorMessage != null)
+              Column(
+                children: [
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = true;
+                        _errorMessage = null;
+                      });
+                      _fetchBuildings();
+                    },
+                    child: const Text('다시 시도'),
+                  ),
+                ],
+              )
+            else
+              DropdownButtonFormField<Building>(
+                value: _selectedBuilding,
+                items: _buildings
+                    .map((b) => DropdownMenuItem(value: b, child: Text(b.name)))
+                    .toList(),
+                onChanged: (b) {
+                  setState(() {
+                    _selectedBuilding = b;
+                  });
+                },
+                decoration: InputDecoration(
+                  labelText: '동 선택',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            const SizedBox(height: 12),
             _buildTextField(
               controller: _titleController,
               hintText: '제목을 입력하세요',
@@ -88,9 +163,54 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: 등록 기능 구현
-                    },
+                    onPressed: _isSubmitting
+                        ? null
+                        : () async {
+                            if (_titleController.text.trim().isEmpty ||
+                                _contentController.text.trim().isEmpty ||
+                                _selectedBuilding == null ||
+                                user == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('모든 필드를 입력해 주세요.'),
+                                ),
+                              );
+                              return;
+                            }
+                            setState(() {
+                              _isSubmitting = true;
+                            });
+                            try {
+                              await BoardApi().createPost(
+                                title: _titleController.text.trim(),
+                                content: _contentController.text.trim(),
+                                apartmentId: _selectedBuilding!.apartmentId,
+                                buildingId: _selectedBuilding!.buildingId,
+                                userId: user.id,
+                                images: _images,
+                              );
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('게시글이 등록되었습니다.'),
+                                  ),
+                                );
+                                Navigator.of(context).pop();
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('등록 실패: $e')),
+                                );
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  _isSubmitting = false;
+                                });
+                              }
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0066CC),
                       shape: RoundedRectangleBorder(
@@ -98,13 +218,22 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: Text(
-                      '등록',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            '등록',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -116,28 +245,112 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   Widget _buildImageAttachment() {
-    return GestureDetector(
-      onTap: () {
-        // TODO: 이미지 선택 기능 구현
-      },
-      child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4.0),
-          border: Border.all(color: const Color(0xFFCCCCCC)),
-        ),
-        child: Center(
-          child: Text(
-            '＋',
-            style: GoogleFonts.inter(
-              fontSize: 24,
-              color: const Color(0xFFCCCCCC),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 80,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _images.length + 1,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              if (index == _images.length) {
+                // + 버튼
+                return GestureDetector(
+                  onTap: _onPickImage,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4.0),
+                      border: Border.all(color: const Color(0xFFCCCCCC)),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '＋',
+                        style: TextStyle(
+                          fontSize: 32,
+                          color: Color(0xFFCCCCCC),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                // 이미지 썸네일 + 삭제 버튼
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4.0),
+                      child: Image.file(
+                        _images[index],
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _images.removeAt(index);
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _onPickImage() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('갤러리에서 선택'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('카메라로 촬영'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
         ),
       ),
     );
+    if (source == null) return;
+    final picked = await _picker.pickImage(source: source, imageQuality: 85);
+    if (picked != null) {
+      setState(() {
+        _images.add(File(picked.path));
+      });
+    }
   }
 
   Widget _buildTextField({

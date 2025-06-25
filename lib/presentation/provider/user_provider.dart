@@ -69,6 +69,7 @@ class UserProvider extends ChangeNotifier {
     final oldUser = _user;
 
     final updatedUser = UserData(
+      id: _user!.id,
       email: _user!.email,
       address: address,
       latitude: _user!.latitude,
@@ -79,6 +80,7 @@ class UserProvider extends ChangeNotifier {
       emailVerified: _user!.emailVerified,
       phoneVerified: _user!.phoneVerified,
       name: _user!.name,
+      apartmentId: _user!.apartmentId,
     );
 
     try {
@@ -93,6 +95,14 @@ class UserProvider extends ChangeNotifier {
       _user = oldUser;
       notifyListeners();
       rethrow;
+    }
+  }
+
+  void setApartmentId(String apartmentId) {
+    if (_user != null) {
+      _user = _user!.copyWith(apartmentId: apartmentId);
+      _storage.write(key: 'user_data', value: jsonEncode(_user!.toJson()));
+      notifyListeners();
     }
   }
 }
