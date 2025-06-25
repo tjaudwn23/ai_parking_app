@@ -19,8 +19,12 @@ class BuildingApi {
     }
   }
 
-  Future<List<Building>> fetchAllBuildings() async {
-    final uri = Uri.parse('http://localhost:8000/api/buildings');
+  /// 특정 아파트의 모든 동(건물) 리스트를 조회합니다.
+  /// [apartmentId] : 아파트의 고유 ID
+  Future<List<Building>> fetchAllBuildings(String apartmentId) async {
+    final uri = Uri.parse(
+      'http://localhost:8000/api/buildings',
+    ).replace(queryParameters: {'apartment_id': apartmentId});
     final response = await http.get(
       uri,
       headers: {'Content-Type': 'application/json'},

@@ -37,8 +37,16 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   Future<void> _fetchBuildings() async {
+    final user = Provider.of<UserProvider>(context, listen: false).user;
+    if (user == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = '로그인 정보가 없거나 아파트 정보가 없습니다.';
+      });
+      return;
+    }
     try {
-      final buildings = await BuildingApi().fetchAllBuildings();
+      final buildings = await BuildingApi().fetchAllBuildings(user.apartmentId);
       setState(() {
         _buildings = buildings;
         if (_buildings.isNotEmpty) {
