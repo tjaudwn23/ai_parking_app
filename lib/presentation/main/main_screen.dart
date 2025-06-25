@@ -127,6 +127,7 @@ class _HomeScreen extends StatelessWidget {
                     ? 0
                     : b.parkingStatus.availableSpaces /
                           b.parkingStatus.totalSpaces,
+                buildingId: b.buildingId,
               );
             },
           );
@@ -141,12 +142,14 @@ class _ParkingStatusCard extends StatelessWidget {
   final int available;
   final int total;
   final double progress;
+  final String buildingId;
 
   const _ParkingStatusCard({
     required this.dong,
     required this.available,
     required this.total,
     required this.progress,
+    required this.buildingId,
   });
 
   @override
@@ -160,6 +163,7 @@ class _ParkingStatusCard extends StatelessWidget {
               dong: dong,
               available: available,
               total: total,
+              buildingId: buildingId,
             ),
           ),
         );
