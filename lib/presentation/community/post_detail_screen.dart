@@ -146,7 +146,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     final userName = (post.userName != null && post.userName!.trim().isNotEmpty)
         ? post.userName!
         : '알 수 없음';
-    final commentCount = post.commentCount ?? 0;
     final commentList = post.comments ?? [];
     final title = post.title ?? '(제목 없음)';
     final content = post.content ?? '';

@@ -5,7 +5,6 @@ import 'package:ai_parking/data/model/login_response.dart';
 import 'package:ai_parking/data/model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 
 class UserProvider extends ChangeNotifier {
   UserData? _user;
@@ -55,6 +54,10 @@ class UserProvider extends ChangeNotifier {
 
   Future<String?> getAccessToken() async {
     return await _storage.read(key: 'access_token');
+  }
+
+  Future<String?> getRefreshToken() async {
+    return await _storage.read(key: 'refresh_token');
   }
 
   Future<void> editProfile({

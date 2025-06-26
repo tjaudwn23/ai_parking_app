@@ -138,4 +138,21 @@ class AuthApi {
       throw Exception('프로필 수정 실패: $response');
     }
   }
+
+  /// refresh_token으로 access_token 재발급
+  Future<Map<String, dynamic>> refreshToken(String refreshToken) async {
+    final response = await _client.post(
+      Uri.parse('$baseUrl/api/auth/refresh-token'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{'refresh_token': refreshToken}),
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception('Failed to refresh token: ${response.body}');
+    }
+  }
 }

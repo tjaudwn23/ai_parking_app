@@ -74,29 +74,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  Center(
-                    child: Column(
-                      children: [
-                        const CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Color(0xFFF5F5F5),
-                          child: Icon(
-                            Icons.person,
-                            size: 40,
-                            color: Color(0xFFCCCCCC),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '(변경)',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: const Color(0xFF0066CC),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                   const SizedBox(height: 32),
                   _buildTextField(
                     label: '닉네임',

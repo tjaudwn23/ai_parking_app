@@ -1,7 +1,6 @@
 import 'package:ai_parking/data/data_source/auth_api.dart';
 import 'package:ai_parking/data/model/user_register.dart';
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
-import 'package:ai_parking/presentation/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kpostal/kpostal.dart';

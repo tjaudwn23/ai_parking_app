@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_parking/data/model/building.dart';
 import 'package:ai_parking/data/data_source/building_api.dart';
-import 'package:ai_parking/data/model/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:ai_parking/presentation/provider/user_provider.dart';
 

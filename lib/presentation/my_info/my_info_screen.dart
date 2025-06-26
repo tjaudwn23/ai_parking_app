@@ -45,8 +45,6 @@ class MyInfoScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _ProfileSection(),
-              const SizedBox(height: 20),
               const _AccountInfoSection(),
               const SizedBox(height: 20),
               const _SettingsSection(),
@@ -56,65 +54,6 @@ class MyInfoScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _ProfileSection extends StatelessWidget {
-  const _ProfileSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) {
-        final user = userProvider.user;
-        if (user == null) {
-          return const Center(child: Text('사용자 정보가 없습니다.'));
-        }
-
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 24.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              const CircleAvatar(
-                radius: 40,
-                backgroundColor: Color(0xFFF5F5F5),
-                // TODO: Add user profile image
-                child: Icon(Icons.person, size: 40, color: Color(0xFFCCCCCC)),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                user.nickname,
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF454545),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                user.nickname, // 임시로 닉네임 표시
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: const Color(0xFF999999),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
@@ -146,8 +85,11 @@ class _AccountInfoSection extends StatelessWidget {
             ],
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _InfoRow(title: '아이디', value: user.email), // 임시로 닉네임 표시
+              _InfoRow(title: '닉네임', value: user.nickname),
+              const SizedBox(height: 12),
+              _InfoRow(title: '아이디', value: user.email),
               const SizedBox(height: 12),
               _InfoRow(title: '집 주소', value: user.address),
               const SizedBox(height: 12),
@@ -274,10 +216,19 @@ class _SettingsSection extends StatelessWidget {
                   context,
                   listen: false,
                 );
-                final token = await userProvider.getAccessToken();
+                final refreshToken = await userProvider.getRefreshToken();
                 bool success = false;
-                if (token != null) {
-                  success = await AuthApi().withdrawal(token);
+                if (refreshToken != null) {
+                  try {
+                    final authApi = AuthApi();
+                    final tokenData = await authApi.refreshToken(refreshToken);
+                    final newAccessToken = tokenData['access_token'] as String?;
+                    if (newAccessToken != null) {
+                      success = await authApi.withdrawal(newAccessToken);
+                    }
+                  } catch (e) {
+                    success = false;
+                  }
                 }
                 Navigator.of(context).pop(); // 다이얼로그 닫기
 

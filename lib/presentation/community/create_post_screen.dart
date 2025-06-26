@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:ai_parking/presentation/provider/user_provider.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:ai_parking/presentation/community/post_detail_screen.dart';
 import 'package:ai_parking/data/model/post.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';

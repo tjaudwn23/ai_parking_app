@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_parking/data/data_source/parking_status_api.dart';
 import 'package:ai_parking/data/model/parking_status_response.dart';
-import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'dart:async';
 
