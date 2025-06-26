@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_parking/data/data_source/board_api.dart';
 import 'package:ai_parking/data/model/post.dart';
+import 'package:ai_parking/presentation/community/post_detail_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -24,6 +25,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
   List<Post> _posts = [];
   bool _isPostLoading = false;
   String? _postErrorMessage;
+  int _currentPage = 1;
+  final int _pageSize = 10;
+  bool _hasMore = true;
 
   @override
   void initState() {
@@ -64,7 +68,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   }
 
   // 동 리스트를 받아온 후 게시글을 불러옵니다.
-  Future<void> _fetchPosts() async {
+  Future<void> _fetchPosts({bool append = false}) async {
     if (_selectedDong == null) return;
     setState(() {
       _isPostLoading = true;
@@ -73,10 +77,17 @@ class _CommunityScreenState extends State<CommunityScreen> {
     try {
       final posts = await BoardApi().fetchPostsByBuilding(
         _selectedDong!.buildingId,
+        page: _currentPage,
+        pageSize: _pageSize,
       );
       setState(() {
-        _posts = posts;
+        if (append) {
+          _posts.addAll(posts);
+        } else {
+          _posts = posts;
+        }
         _isPostLoading = false;
+        _hasMore = posts.length == _pageSize;
       });
     } catch (e) {
       setState(() {
@@ -102,13 +113,20 @@ class _CommunityScreenState extends State<CommunityScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined, color: Color(0xFF454545)),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CreatePostScreen(),
                 ),
               );
+              if (result == true) {
+                setState(() {
+                  _currentPage = 1;
+                  _hasMore = true;
+                });
+                await _fetchPosts();
+              }
             },
           ),
         ],
@@ -179,7 +197,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           ),
           Expanded(
-            child: _isPostLoading
+            child: _isPostLoading && _posts.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : _postErrorMessage != null
                 ? Center(
@@ -191,24 +209,36 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 : _posts.isEmpty
                 ? const Center(child: Text('게시글이 없습니다.'))
                 : ListView.builder(
-                    itemCount:
-                        _posts.length + 1, // +1 for the "Load More" button
+                    itemCount: _posts.length + (_hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == _posts.length) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           child: Center(
                             child: TextButton(
-                              onPressed: () {
-                                // TODO: Load more posts (페이징 구현 시)
-                              },
-                              child: Text(
-                                '더 보기',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: const Color(0xFF454545),
-                                ),
-                              ),
+                              onPressed: _isPostLoading
+                                  ? null
+                                  : () async {
+                                      setState(() {
+                                        _currentPage++;
+                                      });
+                                      await _fetchPosts(append: true);
+                                    },
+                              child: _isPostLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      '더 보기',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        color: const Color(0xFF454545),
+                                      ),
+                                    ),
                             ),
                           ),
                         );
@@ -224,47 +254,75 @@ class _CommunityScreenState extends State<CommunityScreen> {
   }
 
   Widget _buildPostCard(Post post, int index) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFF5F5F5), width: 1)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${index + 1}', // 1부터 시작하는 인덱스
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: const Color(0xFF454545),
-            ),
+    final title = post.title ?? '(제목 없음)';
+    final userName = (post.userName != null && post.userName!.isNotEmpty)
+        ? post.userName!
+        : '알 수 없음';
+    final createdAt = post.createdAt;
+    final commentCount = post.commentCount ?? 0;
+    String dateStr = '';
+    if (createdAt != null) {
+      dateStr =
+          '${createdAt.year.toString().padLeft(4, '0')}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}';
+    } else {
+      dateStr = '날짜 없음';
+    }
+    return InkWell(
+      onTap: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PostDetailScreen(post: post)),
+        );
+        if (result == true) {
+          setState(() {
+            _currentPage = 1;
+            _hasMore = true;
+          });
+          await _fetchPosts();
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Color(0xFFF5F5F5), width: 1),
           ),
-          const SizedBox(width: 22),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  post.title,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    color: const Color(0xFF454545),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  '${post.userName} · '
-                  '${post.createdAt.year.toString().padLeft(4, '0')}-${post.createdAt.month.toString().padLeft(2, '0')}-${post.createdAt.day.toString().padLeft(2, '0')}'
-                  ' · 💬 ${post.commentCount}',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: const Color(0xFF999999),
-                  ),
-                ),
-              ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${index + 1}', // 1부터 시작하는 인덱스
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: const Color(0xFF454545),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 22),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      color: const Color(0xFF454545),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    '$userName · $dateStr · 💬 $commentCount',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: const Color(0xFF999999),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -274,6 +332,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
   void _onDongChanged(Building? newValue) {
     setState(() {
       _selectedDong = newValue;
+      _currentPage = 1;
+      _hasMore = true;
     });
     _fetchPosts();
   }

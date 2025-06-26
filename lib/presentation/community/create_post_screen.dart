@@ -7,9 +7,14 @@ import 'package:provider/provider.dart';
 import 'package:ai_parking/presentation/provider/user_provider.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:ai_parking/presentation/community/post_detail_screen.dart';
+import 'package:ai_parking/data/model/post.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key});
+  final Post? post;
+  const CreatePostScreen({super.key, this.post});
 
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
@@ -26,6 +31,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final List<File> _images = [];
   final ImagePicker _picker = ImagePicker();
   bool _isSubmitting = false;
+  List<String> _networkImages = [];
 
   @override
   void initState() {
@@ -33,6 +39,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     _contentController.addListener(() {
       setState(() {});
     });
+    if (widget.post != null) {
+      _titleController.text = widget.post!.title ?? '';
+      _contentController.text = widget.post!.content ?? '';
+      _networkImages = (widget.post!.imageUrls ?? []).toList();
+      // TODO: _selectedBuilding 등도 post 값으로 초기화 (필요시)
+    }
     _fetchBuildings();
   }
 
@@ -189,26 +201,56 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               _isSubmitting = true;
                             });
                             try {
-                              await BoardApi().createPost(
-                                title: _titleController.text.trim(),
-                                content: _contentController.text.trim(),
-                                apartmentId: _selectedBuilding!.apartmentId,
-                                buildingId: _selectedBuilding!.buildingId,
-                                userId: user.id,
-                                images: _images,
-                              );
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('게시글이 등록되었습니다.'),
-                                  ),
+                              if (widget.post != null) {
+                                // 수정
+                                // 네트워크 이미지 URL을 File로 변환
+                                final List<File> networkFiles =
+                                    await Future.wait(
+                                      _networkImages.map(urlToFile),
+                                    );
+                                final List<File> allFiles = [
+                                  ..._images,
+                                  ...networkFiles,
+                                ];
+                                await BoardApi().updatePost(
+                                  postId: widget.post!.id!,
+                                  title: _titleController.text.trim(),
+                                  content: _contentController.text.trim(),
+                                  apartmentId: _selectedBuilding!.apartmentId,
+                                  buildingId: _selectedBuilding!.buildingId,
+                                  images: allFiles, // 모두 File로 변환
                                 );
-                                Navigator.of(context).pop();
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('게시글이 수정되었습니다.'),
+                                    ),
+                                  );
+                                  Navigator.of(context).pop(true);
+                                }
+                              } else {
+                                // 등록
+                                await BoardApi().createPost(
+                                  title: _titleController.text.trim(),
+                                  content: _contentController.text.trim(),
+                                  apartmentId: _selectedBuilding!.apartmentId,
+                                  buildingId: _selectedBuilding!.buildingId,
+                                  userId: user.id,
+                                  images: _images,
+                                );
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('게시글이 등록되었습니다.'),
+                                    ),
+                                  );
+                                  Navigator.of(context).pop(true);
+                                }
                               }
                             } catch (e) {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('등록 실패: $e')),
+                                  SnackBar(content: Text('등록/수정 실패: $e')),
                                 );
                               }
                             } finally {
@@ -236,7 +278,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             ),
                           )
                         : Text(
-                            '등록',
+                            widget.post != null ? '수정' : '등록',
                             style: GoogleFonts.inter(
                               color: Colors.white,
                               fontSize: 16,
@@ -260,10 +302,87 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           height: 80,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: _images.length + 1,
+            itemCount: _networkImages.length + _images.length + 1,
             separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
-              if (index == _images.length) {
+              if (index < _networkImages.length) {
+                // 네트워크 이미지
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4.0),
+                      child: Image.network(
+                        _networkImages[index],
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _networkImages.removeAt(index);
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else if (index < _networkImages.length + _images.length) {
+                // 로컬 파일 이미지
+                final fileIndex = index - _networkImages.length;
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4.0),
+                      child: Image.file(
+                        _images[fileIndex],
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _images.removeAt(fileIndex);
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
                 // + 버튼
                 return GestureDetector(
                   onTap: _onPickImage,
@@ -284,44 +403,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       ),
                     ),
                   ),
-                );
-              } else {
-                // 이미지 썸네일 + 삭제 버튼
-                return Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4.0),
-                      child: Image.file(
-                        _images[index],
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _images.removeAt(index);
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.all(2),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 );
               }
             },
@@ -396,5 +477,15 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       ),
       style: GoogleFonts.inter(fontSize: 16, color: const Color(0xFF454545)),
     );
+  }
+
+  Future<File> urlToFile(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    final documentDirectory = await getTemporaryDirectory();
+    final file = File(
+      '${documentDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.png',
+    );
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
   }
 }

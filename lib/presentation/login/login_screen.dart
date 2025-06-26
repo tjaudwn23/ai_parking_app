@@ -43,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('로그인 중 오류가 발생했습니다\n아이디와 비밀번호를 확인해주세요.')),
         );
-        print(e);
       }
     } finally {
       if (mounted) {
