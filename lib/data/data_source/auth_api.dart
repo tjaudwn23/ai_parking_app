@@ -6,8 +6,11 @@ import 'package:http/http.dart' as http;
 import '../model/notification_settings.dart';
 import 'package:ai_parking/data/model/user_data.dart';
 
+import 'board_api.dart';
+
 class AuthApi {
-  static const String baseUrl = 'http://localhost:8000';
+  //static const String baseUrl = 'http://localhost:8000';
+  static const String baseUrl = BASE_URL;
   final http.Client _client;
 
   AuthApi({http.Client? client}) : _client = client ?? http.Client();

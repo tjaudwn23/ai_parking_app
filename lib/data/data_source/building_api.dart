@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/building.dart';
+import 'board_api.dart';
 
 class BuildingApi {
   Future<BuildingListResponse> fetchBuildings(String fullAddress) async {
     final uri = Uri.parse(
-      'http://localhost:8000/api/apartments/buildings',
+      BASE_URL + '/api/apartments/buildings',
     ).replace(queryParameters: {'full_address': fullAddress});
     final response = await http.get(
       uri,
@@ -23,7 +24,7 @@ class BuildingApi {
   /// [apartmentId] : 아파트의 고유 ID
   Future<List<Building>> fetchAllBuildings(String apartmentId) async {
     final uri = Uri.parse(
-      'http://localhost:8000/api/buildings',
+      BASE_URL + '/api/buildings',
     ).replace(queryParameters: {'apartment_id': apartmentId});
     final response = await http.get(
       uri,

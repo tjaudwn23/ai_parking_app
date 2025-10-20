@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../model/post.dart';
 
-const String BASE_URL = 'http://localhost:8000';
+//const String BASE_URL = 'http://localhost:8000';
+const String BASE_URL = 'http://fine402.cafe24.com';
 
 class BoardApi {
   Future<void> createPost({
