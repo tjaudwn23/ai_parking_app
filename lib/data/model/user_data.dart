@@ -1,3 +1,9 @@
+/// 사용자 데이터 모델(UserData)
+/// - 앱에서 사용하는 사용자 정보를 담는 데이터 클래스입니다.
+/// - 서버에서 받아온 사용자 정보를 파싱하여 객체로 만듭니다.
+/// - fromJson()으로 JSON을 객체로, toJson()으로 객체를 JSON으로 변환합니다.
+/// - copyWith() 메서드를 통해 불변성을 유지하면서 일부 필드만 변경할 수 있습니다.
+
 class UserData {
   final String id;
   final String email;

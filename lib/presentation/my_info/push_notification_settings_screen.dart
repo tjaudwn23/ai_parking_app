@@ -1,3 +1,9 @@
+/// 푸시 알림 설정 화면(PushNotificationSettingsScreen)
+/// - 사용자가 받을 푸시 알림의 종류를 설정하는 화면입니다.
+/// - 주차장 정보 업데이트, 새 게시글, 댓글/좋아요, 앱 소식 등의 알림을 개별적으로 ON/OFF 할 수 있습니다.
+/// - 설정 변경 시 즉시 서버에 저장됩니다.
+/// - 로그인 시 저장된 알림 설정을 불러와 표시합니다.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_parking/data/data_source/auth_api.dart';

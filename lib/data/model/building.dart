@@ -1,3 +1,17 @@
+/// 건물(아파트 동) 관련 데이터 모델(building.dart)
+/// 
+/// Building 클래스:
+/// - 아파트의 동(건물) 정보를 담는 클래스입니다.
+/// - 동 ID, 이름, 아파트 ID, 주차 상태 등을 포함합니다.
+/// 
+/// ParkingStatus 클래스:
+/// - 건물의 주차 상태 정보를 담는 클래스입니다 (Building 내부용).
+/// - 총 주차 공간과 비어있는 공간 수를 포함합니다.
+/// 
+/// BuildingListResponse 클래스:
+/// - 건물 목록 API 응답을 담는 클래스입니다.
+/// - 아파트 ID와 해당 아파트의 동 목록을 포함합니다.
+
 class Building {
   final int id;
   final String apartmentId;

@@ -1,3 +1,10 @@
+/// 게시글 작성/수정 화면(CreatePostScreen)
+/// - 새로운 게시글을 작성하거나 기존 게시글을 수정하는 화면입니다.
+/// - 동(건물) 선택, 제목, 내용, 이미지 첨부 기능을 제공합니다.
+/// - 이미지는 갤러리에서 선택하거나 카메라로 촬영할 수 있습니다.
+/// - 게시글 수정 모드에서는 기존 이미지를 표시하고 삭제/추가할 수 있습니다.
+/// - 내용은 최대 1000자까지 입력 가능하며 글자 수를 표시합니다.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_parking/data/model/building.dart';

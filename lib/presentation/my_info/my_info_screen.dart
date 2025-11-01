@@ -1,3 +1,9 @@
+/// 내 정보 화면(MyInfoScreen)
+/// - 사용자의 계정 정보(닉네임, 아이디, 주소, 휴대폰 번호 등)를 표시합니다.
+/// - 비밀번호 변경, 푸시 알림 설정, 회원 탈퇴 등의 설정 메뉴를 제공합니다.
+/// - 로그아웃 기능을 제공합니다.
+/// - 프로필 수정 화면으로 이동할 수 있는 설정 버튼이 있습니다.
+
 import 'package:ai_parking/presentation/my_info/change_password_screen.dart';
 import 'package:ai_parking/presentation/my_info/edit_profile_screen.dart';
 import 'package:ai_parking/presentation/my_info/push_notification_settings_screen.dart';

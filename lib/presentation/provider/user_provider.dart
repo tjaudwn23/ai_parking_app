@@ -1,3 +1,9 @@
+/// 사용자 상태 관리 Provider(UserProvider)
+/// - 앱 전체에서 사용자 정보와 인증 상태를 관리하는 ChangeNotifier입니다.
+/// - 로그인, 로그아웃, 자동 로그인, 프로필 수정 등의 기능을 제공합니다.
+/// - FlutterSecureStorage를 사용하여 토큰과 사용자 정보를 안전하게 저장합니다.
+/// - Provider 패턴을 사용하여 앱 전체에서 사용자 상태를 공유합니다.
+
 import 'dart:convert';
 
 import 'package:ai_parking/data/data_source/auth_api.dart';

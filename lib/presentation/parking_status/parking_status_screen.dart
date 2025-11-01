@@ -1,3 +1,10 @@
+/// 주차 상태 화면(ParkingStatusScreen)
+/// - 특정 동(건물)의 실시간 주차 상태를 표시하는 화면입니다.
+/// - 현재 주차 상태와 30분 후 예측 주차 상태를 함께 보여줍니다.
+/// - 주차장 이미지 위에 주차 공간의 위치와 상태(비어있음/차 있음)를 박스로 표시합니다.
+/// - 새로고침 버튼을 통해 최신 주차 상태를 가져올 수 있습니다.
+/// - 커뮤니티 화면으로 이동할 수 있는 버튼을 제공합니다.
+
 import 'package:ai_parking/presentation/community/community_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

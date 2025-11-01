@@ -1,3 +1,10 @@
+/// 회원가입 화면(RegisterScreen)
+/// - 새로운 사용자의 회원가입을 처리하는 화면입니다.
+/// - 이메일, 닉네임, 비밀번호, 주소, 휴대폰 번호 등을 입력받습니다.
+/// - 카카오 주소 검색 API를 사용하여 주소를 검색하고 좌표를 가져옵니다.
+/// - 휴대폰 인증번호 발송 및 검증 기능을 포함합니다 (현재는 TODO 상태).
+/// - 입력값 유효성 검사(이메일 형식, 비밀번호 조건 등)를 수행합니다.
+
 import 'package:ai_parking/data/data_source/auth_api.dart';
 import 'package:ai_parking/data/model/user_register.dart';
 import 'package:ai_parking/presentation/common/custom_text_field.dart';

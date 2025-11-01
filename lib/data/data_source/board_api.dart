@@ -1,3 +1,16 @@
+/// 게시판 관련 API 클래스(BoardApi)
+/// - 커뮤니티 게시판 관련 API 호출을 담당하는 데이터 소스 클래스입니다.
+/// - createPost(): 새 게시글을 작성합니다. 이미지 파일을 multipart/form-data로 전송합니다.
+/// - fetchPostsByBuilding(): 특정 동의 게시글 목록을 페이지네이션으로 가져옵니다.
+/// - fetchPostDetail(): 게시글 상세 정보와 댓글 목록을 가져옵니다.
+/// - createComment(): 댓글을 작성합니다.
+/// - deleteComment(): 댓글을 삭제합니다.
+/// - updatePost(): 게시글을 수정합니다. 기존 이미지와 새 이미지를 함께 처리합니다.
+/// - deletePost(): 게시글을 삭제합니다.
+///
+/// BASE_URL: 서버의 기본 URL 주소입니다.
+library;
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;

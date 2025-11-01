@@ -1,3 +1,10 @@
+/// 비밀번호 변경 화면(ChangePasswordScreen)
+/// - 사용자의 비밀번호를 변경하는 화면입니다.
+/// - 현재 비밀번호, 새 비밀번호, 새 비밀번호 확인을 입력받습니다.
+/// - 비밀번호 유효성 검사(8자 이상, 대문자/소문자 포함)를 수행합니다.
+/// - 비밀번호 표시/숨김 토글 기능을 제공합니다.
+/// - 변경 성공 시 다이얼로그를 표시하고 화면을 닫습니다.
+
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
 import 'package:ai_parking/presentation/provider/user_provider.dart';
 import 'package:flutter/material.dart';

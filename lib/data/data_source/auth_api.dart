@@ -1,3 +1,14 @@
+/// 인증 관련 API 클래스(AuthApi)
+/// - 사용자 인증 및 계정 관리 관련 API 호출을 담당하는 데이터 소스 클래스입니다.
+/// - login(): 이메일과 비밀번호로 로그인하고 토큰과 사용자 정보를 받아옵니다.
+/// - signUp(): 회원가입 요청을 처리합니다.
+/// - changePassword(): 비밀번호 변경을 처리합니다.
+/// - refreshToken(): refresh token으로 새로운 access token을 발급받습니다.
+/// - withdrawal(): 회원 탈퇴를 처리합니다.
+/// - patchUserProfile(): 사용자 프로필 정보를 수정합니다.
+/// - 알림 설정 조회/수정 메서드도 포함되어 있습니다.
+library;
+
 import 'dart:convert';
 import 'package:ai_parking/data/model/login_response.dart';
 import 'package:ai_parking/data/model/user_register.dart';

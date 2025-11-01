@@ -1,3 +1,8 @@
+/// 건물(아파트 동) 관련 API 클래스(BuildingApi)
+/// - 건물 정보 조회 관련 API 호출을 담당하는 데이터 소스 클래스입니다.
+/// - fetchBuildings(): 전체 주소를 받아 해당 아파트의 동 목록을 가져옵니다.
+/// - fetchAllBuildings(): apartmentId를 받아 해당 아파트의 모든 동 목록을 가져옵니다.
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/building.dart';

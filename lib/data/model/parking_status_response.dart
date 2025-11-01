@@ -1,3 +1,17 @@
+/// 주차 상태 응답 데이터 모델(parking_status_response.dart)
+/// 
+/// ParkingStatus 클래스:
+/// - 현재 주차 상태 정보를 담는 클래스입니다.
+/// - 총 주차 공간, 사용 중인 공간, 비어있는 공간, 상세 정보, 이미지 URL 등을 포함합니다.
+/// 
+/// ParkingPrediction 클래스:
+/// - 30분 후 예측 주차 상태 정보를 담는 클래스입니다.
+/// - 예측 시간, 예측된 주차 공간 상태 등을 포함합니다.
+/// 
+/// ParkingStatusResponse 클래스:
+/// - 주차 상태 API 응답을 담는 루트 클래스입니다.
+/// - 현재 상태와 예측 상태를 함께 포함합니다.
+
 class ParkingStatus {
   final String lastUpdate;
   final int totalSpaces;

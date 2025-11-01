@@ -1,3 +1,10 @@
+/// 커뮤니티 게시판 화면(CommunityScreen)
+/// - 아파트 동별 커뮤니티 게시판을 표시하는 화면입니다.
+/// - 드롭다운으로 동(건물)을 선택하면 해당 동의 게시글 목록을 표시합니다.
+/// - 게시글 목록은 페이지네이션으로 구현되어 있으며 "더 보기" 버튼으로 추가 게시글을 불러올 수 있습니다.
+/// - 게시글 작성 버튼으로 새 게시글을 작성할 수 있습니다.
+/// - 게시글을 탭하면 상세 화면으로 이동합니다.
+
 import 'package:ai_parking/data/data_source/building_api.dart';
 import 'package:ai_parking/data/model/building.dart';
 import 'package:provider/provider.dart';

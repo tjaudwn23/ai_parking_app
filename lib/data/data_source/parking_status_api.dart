@@ -1,3 +1,8 @@
+/// 주차 상태 API 클래스(ParkingStatusApi)
+/// - 주차 상태 관련 API 호출을 담당하는 데이터 소스 클래스입니다.
+/// - fetchParkingStatus(): buildingId를 받아 해당 동의 현재 주차 상태와 30분 후 예측 상태를 가져옵니다.
+/// - POST 요청으로 building_id를 전송하고 ParkingStatusResponse를 반환합니다.
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../model/parking_status_response.dart';

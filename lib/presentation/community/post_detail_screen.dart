@@ -1,3 +1,11 @@
+/// 게시글 상세 화면(PostDetailScreen)
+/// - 게시글의 상세 내용을 표시하는 화면입니다.
+/// - 게시글 제목, 내용, 작성자, 작성일, 첨부 이미지, 댓글 목록을 표시합니다.
+/// - 이미지를 탭하면 전체 화면 이미지 뷰어를 표시합니다.
+/// - 댓글 작성, 댓글 삭제 기능을 제공합니다.
+/// - 본인이 작성한 게시글인 경우 수정/삭제 버튼이 표시됩니다.
+/// - 게시글 수정은 CreatePostScreen을 재사용합니다.
+
 import 'package:flutter/material.dart';
 import 'package:ai_parking/data/model/post.dart';
 import 'package:ai_parking/data/data_source/board_api.dart';

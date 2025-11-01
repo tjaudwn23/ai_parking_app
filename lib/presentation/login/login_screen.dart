@@ -1,3 +1,10 @@
+/// 로그인 화면(LoginScreen)
+/// - 사용자 로그인을 처리하는 화면입니다.
+/// - 이메일과 비밀번호를 입력받아 로그인합니다.
+/// - 구글 로그인과 카카오 로그인 버튼이 있으나 현재는 TODO 상태입니다.
+/// - 회원가입 화면으로 이동할 수 있는 버튼을 제공합니다.
+/// - 로그인 성공 시 AuthWrapper가 자동으로 MainScreen으로 전환합니다.
+
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
 import 'package:ai_parking/presentation/register/register_screen.dart';
 import 'package:flutter/material.dart';

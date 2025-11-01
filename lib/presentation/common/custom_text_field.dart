@@ -1,3 +1,8 @@
+/// 커스텀 텍스트 필드 위젯(CustomTextField)
+/// - 앱 전체에서 일관된 디자인의 텍스트 입력 필드를 제공하는 재사용 가능한 위젯입니다.
+/// - 힌트 텍스트, 비밀번호 표시, 읽기 전용 모드, 탭 이벤트 등을 지원합니다.
+/// - Google Fonts의 Inter 폰트를 사용하여 통일된 스타일을 제공합니다.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

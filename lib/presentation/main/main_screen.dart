@@ -1,3 +1,9 @@
+/// 메인 화면(MainScreen)
+/// - 앱의 메인 화면으로 하단 네비게이션 바를 통해 홈/게시판/내 정보 탭을 전환합니다.
+/// - _HomeScreen: 사용자의 아파트 주소 기반으로 동(건물) 리스트를 가져와 주차 상태 카드를 표시합니다.
+/// - 각 동 카드를 탭하면 해당 동의 상세 주차 상태 화면으로 이동합니다.
+/// - 사용자의 apartmentId를 UserProvider에 자동으로 저장합니다.
+
 import 'package:ai_parking/presentation/community/community_screen.dart';
 import 'package:ai_parking/presentation/my_info/my_info_screen.dart';
 import 'package:ai_parking/presentation/parking_status/parking_status_screen.dart';

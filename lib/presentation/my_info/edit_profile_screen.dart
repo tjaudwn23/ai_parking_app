@@ -1,3 +1,9 @@
+/// 프로필 수정 화면(EditProfileScreen)
+/// - 사용자의 프로필 정보(닉네임, 주소, 동/호수, 휴대폰 번호)를 수정하는 화면입니다.
+/// - 현재 사용자 정보를 불러와 텍스트 필드에 초기값으로 표시합니다.
+/// - 주소 검색 및 휴대폰 인증 기능이 TODO 상태로 남아있습니다.
+/// - 수정 완료 시 UserProvider를 통해 서버에 변경사항을 저장합니다.
+
 import 'package:ai_parking/presentation/common/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
