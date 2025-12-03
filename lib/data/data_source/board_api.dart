@@ -48,8 +48,24 @@ class BoardApi {
       );
     }
 
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] POST ${uri.toString()}');
+    print('📤 요청 필드: ${request.fields}');
+    print('📤 요청 파일 수: ${request.files.length}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] POST ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('게시글 등록 실패: ${response.body}');
     }
@@ -70,10 +86,26 @@ class BoardApi {
         'page_size': pageSize.toString(),
       },
     );
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] GET ${uri.toString()}');
+    print('📤 요청 헤더: {\'Content-Type\': \'application/json\'}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await http.get(
       uri,
       headers: {'Content-Type': 'application/json'},
     );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] GET ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => Post.fromJson(e)).toList();
@@ -83,15 +115,31 @@ class BoardApi {
   }
 
   Future<Post> fetchPostDetail(dynamic postId) async {
+    final uri = Uri.parse('$BASE_URL/api/board/post/${postId.toString()}');
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] GET ${uri.toString()}');
+    print('📤 요청 헤더: {\'Content-Type\': \'application/json\'}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await http.get(
-      Uri.parse('$BASE_URL/api/board/post/${postId.toString()}'),
+      uri,
       headers: {'Content-Type': 'application/json'},
     );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] GET ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final postJson = data['post'] as Map<String, dynamic>;
       postJson['comments'] = data['comments'];
-      print(postJson);
       return Post.fromJson(postJson);
     } else {
       throw Exception('게시글 상세 정보를 불러오지 못했습니다.');
@@ -104,11 +152,33 @@ class BoardApi {
     required String body,
   }) async {
     final uri = Uri.parse('$BASE_URL/api/board/comment');
+    final requestBody = jsonEncode({
+      'post_id': postId,
+      'user_id': userId,
+      'body': body,
+    });
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] POST ${uri.toString()}');
+    print('📤 요청 헤더: {\'Content-Type\': \'application/json\'}');
+    print('📤 요청 바디: $requestBody');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'post_id': postId, 'user_id': userId, 'body': body}),
+      body: requestBody,
     );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] POST ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('댓글 등록 실패: \\${response.body}');
     }
@@ -116,7 +186,22 @@ class BoardApi {
 
   Future<void> deleteComment(int commentId) async {
     final uri = Uri.parse('$BASE_URL/api/board/comment/$commentId');
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] DELETE ${uri.toString()}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await http.delete(uri);
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] DELETE ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('댓글 삭제 실패: \\${response.body}');
     }
@@ -152,9 +237,25 @@ class BoardApi {
         request.fields['image_files'] = image;
       }
     }
-    print(request.files);
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] PUT ${uri.toString()}');
+    print('📤 요청 필드: ${request.fields}');
+    print('📤 요청 파일 수: ${request.files.length}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] PUT ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('게시글 수정 실패: ${response.body}');
     }
@@ -162,7 +263,22 @@ class BoardApi {
 
   Future<void> deletePost(int postId) async {
     final uri = Uri.parse('$BASE_URL/api/board/post/$postId');
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] DELETE ${uri.toString()}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await http.delete(uri);
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] DELETE ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception('게시글 삭제 실패: \\${response.body}');
     }

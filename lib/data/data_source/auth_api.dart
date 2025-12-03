@@ -27,19 +27,36 @@ class AuthApi {
   AuthApi({http.Client? client}) : _client = client ?? http.Client();
 
   Future<LoginResponse> login(String username, String password) async {
+    final url = '$baseUrl/api/auth/login';
+    final requestBody = jsonEncode(<String, String>{
+      'email': username,
+      'password': password,
+    });
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] POST $url');
+    print('📤 요청 헤더: $headers');
+    print('📤 요청 바디: $requestBody');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await _client.post(
-      Uri.parse('$baseUrl/api/auth/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': username,
-        'password': password,
-      }),
+      Uri.parse(url),
+      headers: headers,
+      body: requestBody,
     );
 
-    // 로그인 API 응답 본문을 출력하여 디버깅
-    print('로그인 API 응답: \x1B[35m\x1B[1m\x1B[4m\x1B[7m${response.body}\x1B[0m');
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] POST $url');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
@@ -50,13 +67,33 @@ class AuthApi {
   }
 
   Future<String> signUp(UserRegister user) async {
+    final url = '$baseUrl/api/auth/signup';
+    final requestBody = jsonEncode(user.toJson());
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] POST $url');
+    print('📤 요청 헤더: $headers');
+    print('📤 요청 바디: $requestBody');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await _client.post(
-      Uri.parse('$baseUrl/api/auth/signup'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(user.toJson()),
+      Uri.parse(url),
+      headers: headers,
+      body: requestBody,
     );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] POST $url');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final Map<String, dynamic> data = jsonDecode(response.body);
@@ -67,15 +104,34 @@ class AuthApi {
   }
 
   Future<String> changePassword(ChangePasswordRequest req) async {
+    final url = '$baseUrl/api/auth/change-password';
+    final requestBody = jsonEncode(req.toJson());
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] POST $url');
+    print('📤 요청 헤더: $headers');
+    print('📤 요청 바디: $requestBody');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await _client.post(
-      Uri.parse('$baseUrl/api/auth/change-password'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(req.toJson()),
+      Uri.parse(url),
+      headers: headers,
+      body: requestBody,
     );
 
-    print(req.toJson());
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] POST $url');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final Map<String, dynamic> data = jsonDecode(response.body);
     if (response.statusCode == 200) {
       return data['message'] ?? '비밀번호가 성공적으로 변경되었습니다.';
@@ -89,14 +145,31 @@ class AuthApi {
     String token,
   ) async {
     final url = Uri.parse('$baseUrl/api/auth/notification-settings');
-    final response = await http.patch(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(settings.toJson()),
+    final requestBody = jsonEncode(settings.toJson());
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] PATCH ${url.toString()}');
+    print(
+      '📤 요청 헤더: ${headers.map((k, v) => MapEntry(k, k == 'Authorization' ? 'Bearer ***' : v))}',
     );
+    print('📤 요청 바디: $requestBody');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    final response = await http.patch(url, headers: headers, body: requestBody);
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] PATCH ${url.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     return response.statusCode == 200;
   }
 
@@ -104,13 +177,29 @@ class AuthApi {
     String token,
   ) async {
     final url = Uri.parse('$baseUrl/api/auth/notification-settings');
-    final response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] GET ${url.toString()}');
+    print(
+      '📤 요청 헤더: ${headers.map((k, v) => MapEntry(k, k == 'Authorization' ? 'Bearer ***' : v))}',
     );
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    final response = await http.get(url, headers: headers);
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] GET ${url.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return NotificationSettings.fromJson(data);
@@ -124,13 +213,30 @@ class AuthApi {
   /// [token]: access token (Bearer)
   /// 성공 시 true, 실패 시 false 반환
   Future<bool> withdrawal(String token) async {
-    final response = await _client.delete(
-      Uri.parse('$baseUrl/api/auth/withdrawal'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+    final url = '$baseUrl/api/auth/withdrawal';
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] DELETE $url');
+    print(
+      '📤 요청 헤더: ${headers.map((k, v) => MapEntry(k, k == 'Authorization' ? 'Bearer ***' : v))}',
     );
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    final response = await _client.delete(Uri.parse(url), headers: headers);
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] DELETE $url');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     return response.statusCode == 200;
   }
 
@@ -138,14 +244,36 @@ class AuthApi {
     UserData userData,
     String accessToken,
   ) async {
-    final response = await _client.patch(
-      Uri.parse('$baseUrl/api/auth/user-profile'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $accessToken',
-      },
-      body: jsonEncode(userData.toJson()),
+    final url = '$baseUrl/api/auth/user-profile';
+    final requestBody = jsonEncode(userData.toJson());
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] PATCH $url');
+    print(
+      '📤 요청 헤더: ${headers.map((k, v) => MapEntry(k, k == 'Authorization' ? 'Bearer ***' : v))}',
     );
+    print('📤 요청 바디: $requestBody');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    final response = await _client.patch(
+      Uri.parse(url),
+      headers: headers,
+      body: requestBody,
+    );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] PATCH $url');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode == 200) {
       return UserData.fromJson(jsonDecode(response.body));
     } else {
@@ -155,13 +283,36 @@ class AuthApi {
 
   /// refresh_token으로 access_token 재발급
   Future<Map<String, dynamic>> refreshToken(String refreshToken) async {
+    final url = '$baseUrl/api/auth/refresh-token';
+    final requestBody = jsonEncode(<String, String>{
+      'refresh_token': refreshToken,
+    });
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] POST $url');
+    print('📤 요청 헤더: $headers');
+    print('📤 요청 바디: $requestBody');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     final response = await _client.post(
-      Uri.parse('$baseUrl/api/auth/refresh-token'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{'refresh_token': refreshToken}),
+      Uri.parse(url),
+      headers: headers,
+      body: requestBody,
     );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] POST $url');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       return data;

@@ -13,10 +13,26 @@ class BuildingApi {
     final uri = Uri.parse(
       BASE_URL + '/api/apartments/buildings',
     ).replace(queryParameters: {'full_address': fullAddress});
+    
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] GET ${uri.toString()}');
+    print('📤 요청 헤더: {\'Content-Type\': \'application/json\'}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
     final response = await http.get(
       uri,
       headers: {'Content-Type': 'application/json'},
     );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] GET ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       return BuildingListResponse.fromJson(data);
@@ -31,10 +47,26 @@ class BuildingApi {
     final uri = Uri.parse(
       BASE_URL + '/api/buildings',
     ).replace(queryParameters: {'apartment_id': apartmentId});
+    
+    // 요청 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🔵 [API 요청] GET ${uri.toString()}');
+    print('📤 요청 헤더: {\'Content-Type\': \'application/json\'}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
     final response = await http.get(
       uri,
       headers: {'Content-Type': 'application/json'},
     );
+
+    // 응답 로그
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🟢 [API 응답] GET ${uri.toString()}');
+    print('📥 응답 상태 코드: ${response.statusCode}');
+    print('📥 응답 헤더: ${response.headers}');
+    print('📥 응답 바디: ${response.body}');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => Building.fromJson(e)).toList();
